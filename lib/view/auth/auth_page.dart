@@ -83,6 +83,7 @@ class LoginScreen extends StatelessWidget {
                                     return null;
                                   },
                                 ),
+                                CheckBox(),
                                 SizedBox(height: 20),
                                 BlocBuilder<AuthBloc, AuthState>(
                                   builder: (context, state) {
@@ -139,6 +140,35 @@ class LoginScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CheckBox extends StatefulWidget {
+  const CheckBox({super.key});
+
+  @override
+  State<CheckBox> createState() => _CheckBoxState();
+}
+
+class _CheckBoxState extends State<CheckBox> {
+  bool checkbox = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Checkbox(
+          value: checkbox,
+          onChanged: (val) {
+            setState(() {
+              checkbox = val ?? false;
+            });
+          },
+        ),
+
+        Text('Remember me'),
+      ],
     );
   }
 }
