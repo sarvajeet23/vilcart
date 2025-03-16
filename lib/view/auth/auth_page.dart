@@ -1,22 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vilcart/view/auth/bloc/login_event.dart';
+import 'package:vilcart/view/auth/bloc/login_event.dart'; // make sure this file exports the updated LoginRequested event with 3 parameters
 import 'package:vilcart/view/auth/bloc/login_state.dart';
-import 'package:vilcart/widgets/flex_text_field.dart';
+import 'package:vilcart/core/widgets/flex_text_field.dart';
 import 'bloc/login_bloc.dart';
+import 'package:vilcart/view/auth/repository/auth_repository.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool rememberMe = false;
 
-  LoginScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  void _loadSavedCredentials() async {
+    final authRepo = AuthRepository();
+    final savedCredentials = await authRepo.getSavedCredentials();
+    setState(() {
+      mobileController.text = savedCredentials["mobileNo"] ?? "";
+      passwordController.text = savedCredentials["password"] ?? "";
+      rememberMe = savedCredentials["mobileNo"] != null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          // Background image
           Positioned.fill(
             child: Image.asset('assets/bg.png', fit: BoxFit.cover),
           ),
@@ -26,8 +49,9 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
+                    // Logo
                     Image.asset('assets/logo.png', fit: BoxFit.cover, scale: 2),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -66,7 +90,7 @@ class LoginScreen extends StatelessWidget {
                                     return null;
                                   },
                                 ),
-                                SizedBox(height: 15),
+                                const SizedBox(height: 15),
                                 FlexTextField(
                                   controller: passwordController,
                                   hintText: "Password",
@@ -83,8 +107,14 @@ class LoginScreen extends StatelessWidget {
                                     return null;
                                   },
                                 ),
-                                CheckBox(),
-                                SizedBox(height: 20),
+                                RememberUser(
+                                  onChanged: (val) {
+                                    setState(() {
+                                      rememberMe = val;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 20),
                                 BlocBuilder<AuthBloc, AuthState>(
                                   builder: (context, state) {
                                     return SizedBox(
@@ -103,10 +133,10 @@ class LoginScreen extends StatelessWidget {
                                             state is AuthLoading
                                                 ? null
                                                 : () {
-                                                  // Validate the form before login attempt
                                                   if (_formKey.currentState
                                                           ?.validate() ??
                                                       false) {
+                                                    // Dispatch login event with rememberMe value
                                                     context
                                                         .read<AuthBloc>()
                                                         .add(
@@ -115,14 +145,15 @@ class LoginScreen extends StatelessWidget {
                                                                 .text,
                                                             passwordController
                                                                 .text,
+                                                            rememberMe,
                                                           ),
                                                         );
                                                   }
                                                 },
                                         child:
                                             state is AuthLoading
-                                                ? CircularProgressIndicator()
-                                                : Text('Login'),
+                                                ? const CircularProgressIndicator()
+                                                : const Text('Login'),
                                       ),
                                     );
                                   },
@@ -144,14 +175,15 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class CheckBox extends StatefulWidget {
-  const CheckBox({super.key});
+class RememberUser extends StatefulWidget {
+  final Function(bool) onChanged;
+  const RememberUser({super.key, required this.onChanged});
 
   @override
-  State<CheckBox> createState() => _CheckBoxState();
+  State<RememberUser> createState() => _RememberUserState();
 }
 
-class _CheckBoxState extends State<CheckBox> {
+class _RememberUserState extends State<RememberUser> {
   bool checkbox = false;
 
   @override
@@ -164,10 +196,10 @@ class _CheckBoxState extends State<CheckBox> {
             setState(() {
               checkbox = val ?? false;
             });
+            widget.onChanged(checkbox);
           },
         ),
-
-        Text('Remember me'),
+        const Text('Remember me'),
       ],
     );
   }

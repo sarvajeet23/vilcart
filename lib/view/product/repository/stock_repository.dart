@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vilcart/repository/api_service.dart';
+import 'package:vilcart/core/repository/api_service.dart';
 import 'package:vilcart/model/product_model.dart';
 
 class ProductRepository {
@@ -19,7 +19,6 @@ class ProductRepository {
       throw Exception("Warehouse ID not found!");
     }
 
-    // Save selected date and customer ID
     await prefs.setString("selected_date", date);
     await prefs.setInt("customer_id", customerId);
 
@@ -32,7 +31,6 @@ class ProductRepository {
       if (response.statusCode == 200) {
         log("Product Response Data: ${response.data}");
 
-        // ✅ Safely check if 'result' exists and is a list
         Map<String, dynamic> responseData = response.data;
         if (responseData.containsKey("result") &&
             responseData["result"] is List) {
@@ -57,7 +55,6 @@ class ProductRepository {
     }
   }
 
-  // ✅ Proper pagination check
   bool hasMoreData(int currentPage, int limit, List<Product> currentData) {
     return currentData.length == limit;
   }

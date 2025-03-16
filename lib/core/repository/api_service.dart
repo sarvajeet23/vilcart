@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vilcart/core/constants/app_constants.dart';
+import 'package:vilcart/core/error/api_error_handler.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -42,46 +43,6 @@ class ApiService {
       );
     } catch (e) {
       throw ApiErrorHandler.handleError(e);
-    }
-  }
-}
-class AppConstants {
-  static const String baseUrl =
-      "https://business.city-link.co.in/testingstorage";
-  static const String loginEndpoint = "auth/signin";
-}
-
-class ApiErrorHandler {
-  static final Logger logger = Logger();
-
-  static String handleError(dynamic error) {
-    if (error is DioException) {
-      String message;
-      switch (error.type) {
-        case DioExceptionType.connectionTimeout:
-          message = "Connection timeout!";
-          logger.e(message); // Red
-          break;
-        case DioExceptionType.receiveTimeout:
-          message = "Receive timeout!";
-          logger.w(message); // Yellow
-          break;
-        case DioExceptionType.badResponse:
-          message = "Invalid response: ${error.response?.data}";
-          logger.e(message); // Red
-          break;
-        case DioExceptionType.cancel:
-          message = "Request was cancelled!";
-          logger.i(message); // Blue
-          break;
-        default:
-          message = "Unknown network error!";
-          logger.d(message); // Cyan
-      }
-      return message;
-    } else {
-      logger.e("Unexpected error occurred!");
-      return "Unexpected error occurred!";
     }
   }
 }

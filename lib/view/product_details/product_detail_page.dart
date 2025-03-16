@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vilcart/constants/app_colors.dart';
-import 'package:vilcart/constants/app_styles.dart';
+import 'package:vilcart/core/constants/app_colors.dart';
+import 'package:vilcart/core/constants/app_styles.dart';
 import 'package:vilcart/model/product_model.dart';
 
 class ProductDetailPage extends StatelessWidget {

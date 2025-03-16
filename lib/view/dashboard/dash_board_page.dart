@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vilcart/view/product_page.dart';
+import 'package:vilcart/view/product/product_page.dart';
 
 class DashBoardPage extends StatefulWidget {
   const DashBoardPage({super.key});
@@ -14,6 +14,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
   void onChanged(int index) {
     setState(() {
       currentIndex = index;
+      
     });
   }
 

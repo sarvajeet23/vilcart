@@ -1,0 +1,45 @@
+name: "Build & Release"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+      
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    steps:
+      
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 
+
+      
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+
+      - name: Build APK
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.VILCART }}
+          draft: false 
